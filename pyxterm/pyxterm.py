@@ -103,7 +103,7 @@ COOKIE_TIMEOUT = 86400
 AUTH_DIGITS = 12    # Form authentication code hex-digits
                     # Note: Less than half of the 32 hex-digit state id should be used for form authentication
 
-AUTH_TYPES = ("none", "ssh", "login", "google")
+AUTH_TYPES = ("none", "ssh", "login", "google", "docker")
 
 def cgi_escape(s):
     return cgi.escape(s) if s else ""
@@ -640,8 +640,11 @@ def run_server(options, args):
         if not pyxshell.match_program_name("sshd"):
             sys.exit("Error: sshd must be running for --auth_type=ssh")
         shell_command = ["ssh"]
+    elif options.auth_type == 'docker': 
+        shell_command = ["dockershell"]
     else:
         shell_command = ["bash"]
+
 
     tem_str = options.term_options.strip().replace(" ","")
     term_options = set(tem_str.split(",") if tem_str else [])

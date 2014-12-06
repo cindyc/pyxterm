@@ -454,9 +454,12 @@ class TermManager(object):
         elif shell_command and os.path.isabs(shell_command[0]):
             # Absolute path shell command
             cmd_args = shell_command[:]
+        elif 'dockershell' in shell_command: 
+	    cmd_args = shell_command[:]
         else:
             logging.error("Invalid shell command: %s", shell_command)
             os._exit(1)
+	logging.info('cmd_args is {0}'.format(cmd_args))
 
         if term_dir:
             try:
