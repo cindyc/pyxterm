@@ -311,7 +311,19 @@ class Terminal(object):
         assert isinstance(data, bytes), "Must read byte-encoded data"
 
         # Decode data (raw binary data transmitted via terminal must use base64 encoding)
-        self.write(data.decode(self.term_encoding))
+        # TODO (cc) revisit this, for some reason when running pyxterm in docker container,
+	# I'm getting this when running vim (other editor programs like emacs works fine):
+  	# File "/usr/lib/python2.7/encodings/utf_8.py", line 16, in decode
+    	# return codecs.utf_8_decode(input, errors, True)
+	# UnicodeDecodeError: 'utf8' codec can't decode byte 0xbd in position 6: invalid start byte
+	# W141207/06:03 pyxshell.0630 TermManager.loop: INTERNAL READ ERROR (tty1) 'utf8' codec can't decode byte 0xbd in position 6: invalid start byte
+	# W141207/06:03 pyxshell.0561 kill_idle: tty1
+	# ignore the decode error for now
+	try:	    
+            self.write(data.decode(self.term_encoding))
+        except UnicodeDecodeError, e:
+	    logging.error("Can't decode data {0}: {1}".format(data, str(e)))
+            self.write("")
 
         reply = self.read()   # Read any immediate reply to escape-sequence terminal queries
         if reply:
